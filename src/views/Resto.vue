@@ -1,23 +1,25 @@
 <template>
   <div class="resto">
-      <h1>Recherche</h1>
+    <h1>Recherche:</h1>
+    <br />
     <v-toolbar dense floating>
-        <v-text-field
-          hide-details
-          prepend-icon="mdi-magnify"
-          single-line
-          @keyup="searchTimeOut"
-          v-model="search"
-        ></v-text-field>
-
-      </v-toolbar>
+      <v-text-field
+        hide-details
+        prepend-icon="mdi-magnify"
+        @keyup="searchTimeOut"
+        v-model="search"
+        label="Ville"
+      ></v-text-field>
+    </v-toolbar>
     <div v-if="loading">
       <v-progress-circular indeterminate color="purple"></v-progress-circular>
     </div>
     <div v-else>
-      
-      <input type="text" v-model="searchResto" placeholder="search resto" />
-<v-col cols="12" sm="4">
+      <br />
+      <v-row>
+        <v-col cols="12" sm="1"> </v-col>
+
+        <v-col cols="12" sm="4">
           <v-autocomplete
             :items="categori"
             outlined
@@ -28,7 +30,19 @@
             multiple
           ></v-autocomplete>
         </v-col>
+        <v-col cols="12" sm="4">
+          <v-text-field
+            outlined
+            label="Nom du resto"
+            type="text"
+            v-model="searchResto"
+          />
+        </v-col>
 
+        <v-col cols="12" sm="3">
+          <v-switch outlined v-model="singleExpand" label="Ouvert ?"></v-switch>
+        </v-col>
+      </v-row>
       <v-container grid-list-md>
         <v-layout row wrap>
           <v-flex xs4 v-for="item in filteredResto" :key="item.name">
@@ -36,9 +50,6 @@
           </v-flex>
         </v-layout>
       </v-container>
-
-
-
     </div>
   </div>
 </template>
@@ -53,10 +64,11 @@ export default {
   data: function data() {
     return {
       loading: true,
+      singleExpand: true,
       items: [],
       categori: [],
       search: "Lyon",
-      searchResto:"",
+      searchResto: "",
     };
   },
   components: {
@@ -73,8 +85,8 @@ export default {
     },
   },
   methods: {
-    getResto () {
-      var url = this.$adresse + "search?location="+this.search+"&limit=45";
+    getResto() {
+      var url = this.$adresse + "search?location=" + this.search + "&limit=9";
       fetch(url, {
         headers: {
           Authorization: "Bearer " + this.$token,
@@ -88,24 +100,24 @@ export default {
           this.items = text.businesses;
           this.loading = false;
 
-          this.items.forEach(item => {
-            item.categories.forEach(catego => {
-            this.categori.push(catego.title);
-          });
+          this.items.forEach((item) => {
+            item.categories.forEach((catego) => {
+              this.categori.push(catego.title);
+            });
           });
         })
         .catch(function (error) {
           console.log("Request failed", error);
         });
     },
-    searchTimeOut () {
+    searchTimeOut() {
       if (this.timer) {
         clearTimeout(this.timer);
         this.timer = null;
       }
       this.timer = setTimeout(() => {
         this.getResto();
-      }, 1000);
+      }, 500);
     },
   },
 };

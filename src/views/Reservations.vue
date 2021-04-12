@@ -39,6 +39,7 @@ export default {
     };
   },
   created() {
+    store.state.list = [];
         console.log(store.state.list);
     var leadsRef = db.ref("users");
     leadsRef.on("value", function (snapshot) {

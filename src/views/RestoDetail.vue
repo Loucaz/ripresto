@@ -11,21 +11,40 @@
         Payement effectué
       </v-alert>
 
-
       <v-row justify="center">
         <v-dialog v-model="dialog" persistent max-width="1200px">
           <template v-slot:activator="{ on, attrs }">
-            
-          <div v-if="paye">
-            <v-btn color="primary" dark @click="pay()">
-              Paye !
-            </v-btn>
-    </div>
-    <div v-else>
-            <v-btn color="primary" dark v-bind="attrs" v-on="on">
-              Réserver
-            </v-btn>
-    </div>
+            <div v-if="paye">
+              <v-btn
+                block
+                elevation="2"
+                fab
+                rounded
+                absolute
+                left
+                color="primary"
+                dark
+                @click="pay()"
+              >
+                Paye !
+              </v-btn>
+            </div>
+            <div v-if="resv">
+              <v-btn
+                block
+                elevation="2"
+                fab
+                rounded
+                absolute
+                left
+                color="primary"
+                dark
+                v-bind="attrs"
+                v-on="on"
+              >
+                Réserver
+              </v-btn>
+            </div>
           </template>
           <v-card>
             <form id="form" v-on:submit.prevent="createEmployee">
@@ -91,11 +110,7 @@
                 <v-btn color="blue darken-1" text @click="dialog = false">
                   Annuler
                 </v-btn>
-                <v-btn
-                  color="blue darken-1"
-                  type="submit"
-                  text
-                >
+                <v-btn color="blue darken-1" type="submit" text>
                   Valider
                 </v-btn>
               </v-card-actions>
@@ -127,7 +142,8 @@ export default {
       loading: true,
       item: null,
       dialog: false,
-      paye:false,
+      paye: false,
+      resv: true,
       alerts: {
         reserv: false,
         pay: store.state.alert,
@@ -172,7 +188,7 @@ export default {
         db.ref("users/" + this.userId).update({ is_checkout: true });
         this.notif("pay");
         store.commit("alert");
-        this.paye=false;
+        this.paye = false;
       }
     },
   },
@@ -185,8 +201,9 @@ export default {
       this.userId = db.ref("users").push(this.newUser).getKey();
       this.dialog = false;
       this.notif("reserv");
-      
-        this.paye=true;
+
+      this.resv = false;
+      this.paye = true;
     },
     getResto() {
       var url = this.$adresse + this.$route.params.id;
@@ -204,7 +221,7 @@ export default {
           this.loading = false;
           this.newUser.resto = this.item.name;
           this.min = this.item.hours[0].open[0].start.substr(0, 2) + ":00";
-          this.max = this.item.hours[0].open[0].end.substr(0, 2) - 1 + ":59";
+          this.max = (this.item.hours[0].open[0].end.substr(0, 2)-1)+ ":59";
           console.log("Request successful", this.max);
           console.log(this);
         })
@@ -239,6 +256,7 @@ export default {
           console.log(this);
           store.commit("alert");
         });
+        
       });
     },
 
@@ -248,7 +266,7 @@ export default {
         id: "order-123",
         displayItems: [
           {
-            label: this.newUser.resto,
+            label: "Resto",
             amount: { currency: "EUR", value: "20.00" },
           },
         ],

@@ -52,11 +52,9 @@
 
     <v-divider class="mx-4"></v-divider>
 
-    <v-card-title>Tonight's availability</v-card-title>
-
     <v-card-actions>
       <v-btn color="deep-purple lighten-2" text @click="detail">
-        Reserve
+        En détail
       </v-btn>
     </v-card-actions>
 
